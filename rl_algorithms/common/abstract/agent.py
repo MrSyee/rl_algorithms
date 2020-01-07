@@ -41,7 +41,7 @@ class Agent(ABC):
         self.env = env
         self.log_cfg = log_cfg
 
-        self.env_name = env.spec.id
+        self.env_name = env.spec.id if not env.spec else env.name
 
         if not self.args.test:
             self.ckpt_path = (
