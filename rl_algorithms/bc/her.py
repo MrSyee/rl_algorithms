@@ -4,7 +4,7 @@
 - Author: Kh Kim
 - Contact: kh.kim@medipixel.io
 """
-from typing import Tuple
+from typing import Callable, Tuple
 
 import numpy as np
 from rl_algorithms.common.abstract.her import HER
@@ -23,6 +23,9 @@ class L1DistanceRewardFn(RewardFn):
             return np.float64(-1.0)
 
 
+l1_distance_reward_fn = L1DistanceRewardFn()
+
+
 @HERS.register_module
 class LunarLanderContinuousHER(HER):
     """HER for LunarLanderContinuous-v2 environment.
@@ -33,9 +36,12 @@ class LunarLanderContinuousHER(HER):
 
     """
 
-    def __init__(self, reward_func=L1DistanceRewardFn):
+    def __init__(
+        self,
+        reward_fn: Callable[[tuple, np.ndarray], np.float64] = l1_distance_reward_fn,
+    ):
         """Initialize."""
-        HER.__init__(self, reward_func=reward_func)
+        HER.__init__(self, reward_fn=reward_fn)
         self.is_goal_in_state = False
 
     # pylint: disable=attribute-defined-outside-init
@@ -84,13 +90,18 @@ class ReacherRewardFn(RewardFn):
         return reward_dist + reward_ctrl
 
 
+reacher_reward_fn = ReacherRewardFn()
+
+
 @HERS.register_module
 class ReacherHER(HER):
     """HER for Reacher-v2 environment."""
 
-    def __init__(self, reward_func=ReacherRewardFn):
+    def __init__(
+        self, reward_fn: Callable[[tuple, np.ndarray], np.float64] = reacher_reward_fn
+    ):
         """Initialize."""
-        HER.__init__(self, reward_func=reward_func)
+        HER.__init__(self, reward_fn=reward_fn)
         self.is_goal_in_state = True
 
     def fetch_desired_states_from_demo(self, _: list):
@@ -130,7 +141,7 @@ class ReacherHER(HER):
         """Get a single transition concatenated with a goal state."""
         state, action, _, next_state, done = transition
 
-        reward = self.reward_func(transition, goal_state)
+        reward = self.reward_fn(transition, goal_state)
         state_ = state
         state_[4:6] = goal_state
         next_state_ = next_state

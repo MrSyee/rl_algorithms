@@ -211,12 +211,11 @@ class TD3Agent(Agent):
 
         return next_state, reward, done, info
 
-    def update_model(
-        self, experiences: Tuple[torch.Tensor, ...]
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def update_model(self) -> Tuple[torch.Tensor, ...]:
         """Train the model after each episode."""
         self.update_step += 1
 
+        experiences = self.memory.sample()
         states, actions, rewards, next_states, dones = experiences
         masks = 1 - dones
 
@@ -286,7 +285,7 @@ class TD3Agent(Agent):
         self.actor_optim.load_state_dict(params["actor_optim"])
         print("[INFO] loaded the model and optimizer from", path)
 
-    def save_params(self, n_episode: int):
+    def save_params(self, n_episode: int):  # type: ignore
         """Save model and optimizer parameters."""
         params = {
             "actor": self.actor.state_dict(),
@@ -301,15 +300,9 @@ class TD3Agent(Agent):
 
         Agent.save_params(self, params, n_episode)
 
-    def write_log(
-        self,
-        i: int,
-        loss: np.ndarray,
-        score: float = 0.0,
-        policy_update_freq: int = 1,
-        avg_time_cost: float = 0.0,
-    ):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, loss, score, policy_update_freq, avg_time_cost = log_value
         total_loss = loss.sum()
         print(
             "[INFO] episode %d, episode_step: %d, total_step: %d, total score: %d\n"
@@ -369,8 +362,7 @@ class TD3Agent(Agent):
                 score += reward
 
                 if len(self.memory) >= self.hyper_params.batch_size:
-                    experiences = self.memory.sample()
-                    loss = self.update_model(experiences)
+                    loss = self.update_model()
                     loss_episode.append(loss)  # for logging
 
             t_end = time.time()
@@ -379,13 +371,14 @@ class TD3Agent(Agent):
             # logging
             if loss_episode:
                 avg_loss = np.vstack(loss_episode).mean(axis=0)
-                self.write_log(
+                log_value = (
                     self.i_episode,
                     avg_loss,
                     score,
                     self.hyper_params.policy_update_freq,
                     avg_time_cost,
                 )
+                self.write_log(log_value)
             if self.i_episode % self.args.save_period == 0:
                 self.save_params(self.i_episode)
                 self.interim_test()

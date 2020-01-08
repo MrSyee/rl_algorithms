@@ -101,7 +101,7 @@ class DDPGfDAgent(DDPGAgent):
 
         return critic_loss_element_wise
 
-    def update_model(self) -> Tuple[torch.Tensor, torch.Tensor]:
+    def update_model(self) -> Tuple[torch.Tensor, ...]:
         """Train the model after each episode."""
         experiences_1 = self.memory.sample(self.per_beta)
         states, actions = experiences_1[:2]
@@ -172,5 +172,6 @@ class DDPGfDAgent(DDPGAgent):
             if i_step == 1 or i_step % 100 == 0:
                 avg_loss = np.vstack(pretrain_loss).mean(axis=0)
                 pretrain_loss.clear()
-                self.write_log(0, avg_loss, 0, t_end - t_begin)
+                log_value = (0, avg_loss, 0, t_end - t_begin)
+                self.write_log(log_value)
         print("[INFO] Pre-Train Complete!\n")

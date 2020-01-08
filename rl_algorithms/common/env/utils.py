@@ -50,5 +50,5 @@ def env_generator(
 def make_envs(env_gen: Callable, n_envs: int = 8) -> SubprocVecEnv:
     """Make multiple environments running on multiprocssors."""
     envs = [env_gen(i) for i in range(n_envs)]
-    envs = SubprocVecEnv(envs)
-    return envs
+    subproc_env = SubprocVecEnv(envs)
+    return subproc_env

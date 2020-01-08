@@ -7,28 +7,27 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Callable, Tuple
 
 import numpy as np
-from rl_algorithms.common.abstract.reward_fn import RewardFn
 
 
 class HER(ABC):
     """Abstract class for HER (final strategy).
 
     Attributes:
-        reward_func (Callable): returns reward from state, action, next_state
+        reward_fn (Callable): returns reward from state, action, next_state
 
     """
 
-    def __init__(self, reward_func: RewardFn):
+    def __init__(self, reward_fn: Callable[[tuple, np.ndarray], np.float64]):
         """Initialize.
 
         Args:
-            reward_func (Callable): returns reward from state, action, next_state
+            reward_fn (Callable): returns reward from state, action, next_state
 
         """
-        self.reward_func = reward_func()
+        self.reward_fn = reward_fn
 
     @abstractmethod
     def fetch_desired_states_from_demo(self, demo: list):
@@ -65,7 +64,7 @@ class HER(ABC):
         state, action, _, next_state, done = transition
 
         done = np.array_equal(next_state, goal_state)
-        reward = self.reward_func(transition, goal_state)
+        reward = self.reward_fn(transition, goal_state)
         state = np.concatenate((state, goal_state), axis=-1)
         next_state = np.concatenate((next_state, goal_state), axis=-1)
 

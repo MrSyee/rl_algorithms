@@ -75,7 +75,7 @@ class Agent(ABC):
         pass
 
     @abstractmethod
-    def update_model(self, *args) -> Tuple[torch.Tensor, ...]:
+    def update_model(self) -> Tuple[torch.Tensor, ...]:
         pass
 
     @abstractmethod
@@ -95,7 +95,7 @@ class Agent(ABC):
         print("[INFO] Saved the model and optimizer to", path)
 
     @abstractmethod
-    def write_log(self, *args):
+    def write_log(self, log_value: tuple):  # type: ignore
         pass
 
     @abstractmethod

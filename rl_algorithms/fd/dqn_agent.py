@@ -147,10 +147,9 @@ class DQfDAgent(DQNAgent):
             n_demo,
         )
 
-    def write_log(
-        self, i: int, avg_loss: np.ndarray, score: float, avg_time_cost: float
-    ):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, avg_loss, score, avg_time_cost = log_value
         print(
             "[INFO] episode %d, episode step: %d, total step: %d, total score: %f\n"
             "epsilon: %f, total loss: %f, dq loss: %f, supervised loss: %f\n"
@@ -199,5 +198,6 @@ class DQfDAgent(DQNAgent):
             if i_step == 1 or i_step % 100 == 0:
                 avg_loss = np.vstack(pretrain_loss).mean(axis=0)
                 pretrain_loss.clear()
-                self.write_log(0, avg_loss, 0.0, t_end - t_begin)
+                log_value = (0, avg_loss, 0.0, t_end - t_begin)
+                self.write_log(log_value)
         print("[INFO] Pre-Train Complete!\n")

@@ -103,12 +103,15 @@ class PrioritizedReplayBuffer(ReplayBuffer):
             indices.append(idx)
         return indices
 
-    def sample(self, beta: float = 0.4) -> Tuple[torch.Tensor, ...]:
+    def sample(
+        self, indices: List[int] = None, beta: float = 0.4
+    ) -> Tuple[torch.Tensor, ...]:
         """Sample a batch of experiences."""
         assert len(self) >= self.batch_size
         assert beta > 0
 
-        indices = self._sample_proportional(self.batch_size)
+        if indices is None:
+            indices = self._sample_proportional(self.batch_size)
 
         # get max weight
         p_min = self.min_tree.min() / self.sum_tree.sum()

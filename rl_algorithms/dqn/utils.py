@@ -7,7 +7,7 @@ This module has DQN util functions.
 - Contact: curt.park@medipixel.io
 """
 
-from typing import List, Tuple, Union
+from typing import Callable, List, Tuple, Union
 
 from rl_algorithms.common.helper_functions import identity
 from rl_algorithms.common.networks.cnn import CNN, CNNLayer
@@ -229,7 +229,7 @@ def get_fc_model(
     # use noisy net
     if cfg.use_noisy_net:
         linear_layer = NoisyLinearConstructor(cfg.std_init)
-        init_fn = identity
+        init_fn: Callable = identity
         cfg.max_epsilon = 0.0
         cfg.min_epsilon = 0.0
     else:

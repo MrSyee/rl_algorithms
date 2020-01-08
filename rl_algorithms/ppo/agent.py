@@ -82,6 +82,7 @@ class PPOAgent(Agent):
         self.masks: list = []
         self.log_probs: list = []
         self.i_episode = 0
+        self.next_state = np.zeros((1,))
 
         self.hyper_params = hyper_params
         self.network_cfg = network_cfg
@@ -162,12 +163,10 @@ class PPOAgent(Agent):
 
         return next_state, reward, done, info
 
-    def update_model(
-        self, next_state: np.ndarray
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def update_model(self) -> Tuple[torch.Tensor, ...]:
         """Train the model after every N episodes."""
 
-        next_state = torch.FloatTensor(next_state).to(device)
+        next_state = torch.FloatTensor(self.next_state).to(device)
         next_value = self.critic(next_state)
 
         returns = ppo_utils.compute_gae(
@@ -287,7 +286,7 @@ class PPOAgent(Agent):
         self.critic_optim.load_state_dict(params["critic_optim_state_dict"])
         print("[INFO] loaded the model and optimizer from", path)
 
-    def save_params(self, n_episode: int):
+    def save_params(self, n_episode: int):  # type: ignore
         """Save model and optimizer parameters."""
         params = {
             "actor_state_dict": self.actor.state_dict(),
@@ -298,14 +297,9 @@ class PPOAgent(Agent):
         Agent.save_params(self, params, n_episode)
 
     def write_log(
-        self,
-        i_episode: int,
-        n_step: int,
-        score: int,
-        actor_loss: float,
-        critic_loss: float,
-        total_loss: float,
+        self, log_value: tuple,
     ):
+        i_episode, n_step, score, actor_loss, critic_loss, total_loss = log_value
         print(
             "[INFO] episode %d\tepisode steps: %d\ttotal score: %d\n"
             "total loss: %f\tActor loss: %f\tCritic loss: %f\n"
@@ -355,14 +349,20 @@ class PPOAgent(Agent):
 
                 if done[0]:
                     n_step = self.episode_steps[0]
-                    self.write_log(
-                        self.i_episode, n_step, score, loss[0], loss[1], loss[2]
+                    log_value = (
+                        self.i_episode,
+                        n_step,
+                        score,
+                        loss[0],
+                        loss[1],
+                        loss[2],
                     )
+                    self.write_log(log_value)
                     score = 0
 
                 self.episode_steps[np.where(done)] = 0
-
-            loss = self.update_model(next_state)
+            self.next_state = next_state
+            loss = self.update_model()
             self.decay_epsilon(self.i_episode)
 
         # termination

@@ -244,7 +244,7 @@ class DDPGAgent(Agent):
         self.critic_optim.load_state_dict(params["critic_optim_state_dict"])
         print("[INFO] loaded the model and optimizer from", path)
 
-    def save_params(self, n_episode: int):
+    def save_params(self, n_episode: int):  # type: ignore
         """Save model and optimizer parameters."""
         params = {
             "actor_state_dict": self.actor.state_dict(),
@@ -256,8 +256,9 @@ class DDPGAgent(Agent):
         }
         Agent.save_params(self, params, n_episode)
 
-    def write_log(self, i: int, loss: np.ndarray, score: int, avg_time_cost: float):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, loss, score, avg_time_cost = log_value
         total_loss = loss.sum()
 
         print(
@@ -333,7 +334,8 @@ class DDPGAgent(Agent):
             # logging
             if losses:
                 avg_loss = np.vstack(losses).mean(axis=0)
-                self.write_log(self.i_episode, avg_loss, score, avg_time_cost)
+                log_value = (self.i_episode, avg_loss, score, avg_time_cost)
+                self.write_log(log_value)
                 losses.clear()
 
             if self.i_episode % self.args.save_period == 0:

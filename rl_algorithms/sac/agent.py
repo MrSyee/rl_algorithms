@@ -324,7 +324,7 @@ class SACAgent(Agent):
 
         print("[INFO] loaded the model and optimizer from", path)
 
-    def save_params(self, n_episode: int):
+    def save_params(self, n_episode: int):  # type: ignore
         """Save model and optimizer parameters."""
         params = {
             "actor": self.actor.state_dict(),
@@ -343,15 +343,9 @@ class SACAgent(Agent):
 
         Agent.save_params(self, params, n_episode)
 
-    def write_log(
-        self,
-        i: int,
-        loss: np.ndarray,
-        score: float = 0.0,
-        policy_update_freq: int = 1,
-        avg_time_cost: float = 0.0,
-    ):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, loss, score, policy_update_freq, avg_time_cost = log_value
         total_loss = loss.sum()
 
         print(
@@ -435,13 +429,14 @@ class SACAgent(Agent):
             # logging
             if loss_episode:
                 avg_loss = np.vstack(loss_episode).mean(axis=0)
-                self.write_log(
+                log_value = (
                     self.i_episode,
                     avg_loss,
                     score,
                     self.hyper_params.policy_update_freq,
                     avg_time_cost,
                 )
+                self.write_log(log_value)
 
             if self.i_episode % self.args.save_period == 0:
                 self.save_params(self.i_episode)

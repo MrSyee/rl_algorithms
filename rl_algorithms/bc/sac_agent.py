@@ -207,15 +207,9 @@ class BCSACAgent(SACAgent):
             n_qf_mask,
         )
 
-    def write_log(
-        self,
-        i: int,
-        loss: np.ndarray,
-        score: float = 0.0,
-        policy_update_freq: int = 1,
-        avg_time_cost: float = 0.0,
-    ):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, loss, score, policy_update_freq, avg_time_cost = log_value
         total_loss = loss.sum()
 
         print(

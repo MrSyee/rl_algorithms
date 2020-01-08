@@ -165,8 +165,9 @@ class BCDDPGAgent(DDPGAgent):
 
         return actor_loss.item(), critic_loss.item(), n_qf_mask
 
-    def write_log(self, i: int, loss: np.ndarray, score: int, avg_time_cost):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, loss, score, avg_time_cost = log_value
         total_loss = loss.sum()
 
         print(

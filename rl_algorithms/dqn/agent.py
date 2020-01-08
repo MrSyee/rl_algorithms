@@ -317,7 +317,7 @@ class DQNAgent(Agent):
         self.dqn_optim.load_state_dict(params["dqn_optim_state_dict"])
         print("[INFO] loaded the model and optimizer from", path)
 
-    def save_params(self, n_episode: int):
+    def save_params(self, n_episode: int):  # type: ignore
         """Save model and optimizer parameters."""
         params = {
             "dqn_state_dict": self.dqn.state_dict(),
@@ -327,8 +327,9 @@ class DQNAgent(Agent):
 
         Agent.save_params(self, params, n_episode)
 
-    def write_log(self, i: int, loss: np.ndarray, score: float, avg_time_cost: float):
+    def write_log(self, log_value: tuple):
         """Write log about loss and score"""
+        i, loss, score, avg_time_cost = log_value
         print(
             "[INFO] episode %d, episode step: %d, total step: %d, total score: %f\n"
             "epsilon: %f, loss: %f, avg q-value: %f (spent %.6f sec/step)\n"
@@ -414,7 +415,8 @@ class DQNAgent(Agent):
 
             if losses:
                 avg_loss = np.vstack(losses).mean(axis=0)
-                self.write_log(self.i_episode, avg_loss, score, avg_time_cost)
+                log_value = (self.i_episode, avg_loss, score, avg_time_cost)
+                self.write_log(log_value)
 
             if self.i_episode % self.args.save_period == 0:
                 self.save_params(self.i_episode)
