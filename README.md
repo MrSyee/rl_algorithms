@@ -1,4 +1,7 @@
 <p align="center">
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <img src="https://user-images.githubusercontent.com/17582508/52845370-4a930200-314a-11e9-9889-e00007043872.jpg" align="center">
 
@@ -30,6 +33,18 @@ We are warmly welcoming external contributors! :)
 ## Contributors
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/minseop4898"><img src="https://avatars1.githubusercontent.com/u/34338299?v=4" width="100px;" alt=""/><br /><sub><b>김민섭</b></sub></a><br /><a href="https://github.com/MrSyee/rl_algorithms/commits?author=minseop4898" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## Algorithms
 
